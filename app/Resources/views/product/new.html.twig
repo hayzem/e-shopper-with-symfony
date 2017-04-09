@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Product creation</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.title) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.price) }}
+        {{ form_row(form.category) }}
+        <ul id="attributes-fields-list" data-prototype="{{ form_widget(form.attributes.vars.prototype)|e }}">
+            {% for attributeField in form.attributes %}
+                <li>
+                    {{ form_errors(attributeField) }}
+                    {{ form_widget(attributeField) }}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <a href="#" id="add-another-attribute">Add another attribute</a>
+        <br>
+        <input type="submit" value="Create" />
+    {{ form_end(form) }}
+
+    <ul>
+        <li>
+            <a href="{{ path('products_index') }}">Back to the list</a>
+        </li>
+    </ul>
+
+
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        // keep track of how many email fields have been rendered
+        var attributeCount = '{{ form.attributes|length }}';
+
+        jQuery(document).ready(function() {
+            jQuery('#add-another-attribute').click(function(e) {
+                e.preventDefault();
+
+                var attributeList = jQuery('#attributes-fields-list');
+
+                // grab the prototype template
+                var newWidget = attributeList.attr('data-prototype');
+                // replace the "__name__" used in the id and name of the prototype
+                // with a number that's unique to your emails
+                // end name attribute looks like name="contact[emails][2]"
+                newWidget = newWidget.replace(/__order__/g, attributeCount);
+                attributeCount++;
+
+                // create a new list element and add it to the list
+                var newLi = jQuery('<li>').html(newWidget);
+                newLi.appendTo(attributeList);
+            });
+        })
+    </script>
+{% endblock %}
